@@ -38,10 +38,6 @@ func (m *Manager) Register(components ...interface{}) {
 	m.components = append(m.components, components...)
 }
 
-func (m *Manager) RegisterProviders(components ...interface{}) {
-	m.providers = append(m.providers, components...)
-}
-
 // Inject components in Manager and inject required dependencies
 // Inject can inject interfaces only, tag public struct fields with `inject:""`
 func (m *Manager) Inject(components ...interface{}) {
