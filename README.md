@@ -16,6 +16,7 @@ Project is inspired by [facebookgo/inject](https://github.com/facebookgo/inject)
 - ordered start, gracefully stop with reverse order
 - easy component and integration tests with mock
 - subcomponents support
+- reduce boilerplate code
 
 ### Component lifecycle:
 
@@ -31,3 +32,5 @@ Project is inspired by [facebookgo/inject](https://github.com/facebookgo/inject)
 
 - [Uber FX](https://github.com/uber-go/fx) - A dependency injection based application framework
 - [Google Wire](https://blog.golang.org/wire) - Compile-time Dependency Injection based on code generation
+- [dargo](https://github.com/jwells131313/dargo) - Dependency Injector for GO inspired by Java [HK2](https://javaee.github.io/hk2/)
+                                                   
