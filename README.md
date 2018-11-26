@@ -3,6 +3,10 @@
 
 # Component Manager
 
+For monolith component based architecture.
+
+Project is inspired by [facebookgo/inject](https://github.com/facebookgo/inject)
+
 ### Features 
 
 - two step initialization
@@ -10,7 +14,7 @@
 - resolving circular dependency 
 - components lifecycle support
 - ordered start, gracefully stop with reverse order
-- mock components for integration tests purpose
+- easy component and integration tests with mock
 - subcomponents support
 
 ### Component lifecycle:
