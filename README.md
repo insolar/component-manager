@@ -25,3 +25,9 @@ Project is inspired by [facebookgo/inject](https://github.com/facebookgo/inject)
 - start(component can call their dependency interfaces, run goroutines)
 - prepare stop(optional)
 - stop (gracefully stop goroutines, close descriptors)
+
+
+### Similar projects
+
+- [Uber FX](https://github.com/uber-go/fx) - A dependency injection based application framework
+- [Google Wire](https://blog.golang.org/wire) - Compile-time Dependency Injection based on code generation
