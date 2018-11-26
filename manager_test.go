@@ -19,6 +19,7 @@ package component
 import (
 	"context"
 	"fmt"
+	"github.com/stretchr/testify/assert"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -56,6 +57,11 @@ type Component2 struct {
 	started    bool
 }
 
+func (cm *Component2) Init(ctx context.Context) error {
+	cm.field2 = "init done"
+	return nil
+}
+
 func (cm *Component2) Start(ctx context.Context) error {
 	cm.Interface1.Method1()
 	cm.Method2()
@@ -70,10 +76,16 @@ func (cm *Component2) Method2() {
 	fmt.Println("Component2.Method2 called")
 }
 
-func TestComponentManager_Register(t *testing.T) {
-	cm := Manager{}
-	cm.Inject(&Component1{}, &Component2{})
+func TestComponentManager_Inject(t *testing.T) {
 
-	require.NoError(t, cm.Start(nil))
-	require.NoError(t, cm.Stop(nil))
+	component1 := &Component1{}
+	component2 := &Component2{}
+	cm := Manager{}
+	cm.Inject(component1, component2)
+
+	ctx := context.Background()
+	require.NoError(t, cm.Init(ctx))
+	assert.Equal(t, "init done", component2.field2)
+	require.NoError(t, cm.Start(ctx))
+	require.NoError(t, cm.Stop(ctx))
 }

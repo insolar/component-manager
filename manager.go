@@ -66,11 +66,6 @@ func (m *Manager) Inject(components ...interface{}) {
 	}
 }
 
-// MustInject panics if inject fail
-func (m *Manager) MustInject(components ...interface{}) {
-	panic("implement me")
-}
-
 func (m *Manager) mustInject(component reflect.Value, fieldMeta reflect.StructField) {
 
 	for _, componentMeta := range append(m.components, m.providers) {
