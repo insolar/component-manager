@@ -21,8 +21,8 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/insolar/insolar/log"
 	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
 )
 
 // Manager provide methods to manage components lifecycle
@@ -54,12 +54,12 @@ func (m *Manager) Inject(components ...interface{}) {
 
 		component := reflect.ValueOf(componentMeta).Elem()
 		componentType := component.Type()
-		log.Debugf("ComponentManager: Inject component: %s", componentType.String())
+		fmt.Printf("ComponentManager: Inject component: %s", componentType.String())
 
 		for i := 0; i < componentType.NumField(); i++ {
 			fieldMeta := componentType.Field(i)
 			if _, ok := fieldMeta.Tag.Lookup("inject"); ok && component.Field(i).IsNil() {
-				log.Debugf("ComponentManager: Component %s need inject: ", componentType.String(), fieldMeta.Name)
+				log.Debugf("ComponentManager: Component %s need inject: %s", componentType.String(), fieldMeta.Name)
 				m.mustInject(component, fieldMeta)
 			}
 		}
@@ -108,7 +108,7 @@ func (m *Manager) Start(ctx context.Context) error {
 				return errors.Wrap(err, "Failed to start components.")
 			}
 		} else {
-			log.Debug("ComponentManager: Component %s has no Start method", name)
+			log.Debugf("ComponentManager: Component %s has no Start method", name)
 		}
 	}
 	return nil
