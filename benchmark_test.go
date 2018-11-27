@@ -51,3 +51,16 @@ func BenchmarkManager_Inject2(b *testing.B) {
 	}
 }
 
+func BenchmarkManager_DirectInject(b *testing.B) {
+	c1 := &Component1{}
+	c2 := &Component2{}
+
+
+	for i := 0; i < b.N; i++ {
+		cm := Manager{}
+		cm.Register(c1, c2)
+		c1.Interface2 = c2
+		c2.Interface1 = c1
+	}
+}
+
