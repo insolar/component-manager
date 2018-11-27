@@ -50,7 +50,7 @@ func (m *Manager) Inject(components ...interface{}) {
 
 		component := reflect.ValueOf(componentMeta).Elem()
 		componentType := component.Type()
-		fmt.Printf("ComponentManager: Inject component: %s", componentType.String())
+		log.Debugf("ComponentManager: Inject component: %s", componentType.String())
 
 		for i := 0; i < componentType.NumField(); i++ {
 			fieldMeta := componentType.Field(i)

@@ -57,6 +57,11 @@ type Component2 struct {
 	started    bool
 }
 
+type Component3 struct {
+	Interface1 Interface1 `inject:""`
+	Interface2 Interface1 `inject:""`
+}
+
 func (cm *Component2) Init(ctx context.Context) error {
 	cm.field2 = "init done"
 	return nil

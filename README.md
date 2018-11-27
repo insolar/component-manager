@@ -5,8 +5,6 @@
 
 For monolith component based architecture.
 
-Project is inspired by [facebookgo/inject](https://github.com/facebookgo/inject)
-
 ### Features 
 
 - two step initialization
@@ -30,7 +28,9 @@ Project is inspired by [facebookgo/inject](https://github.com/facebookgo/inject)
 
 ### Similar projects
 
+- [facebookgo/inject](https://github.com/facebookgo/inject) - reflect based dependency injector
 - [Uber FX](https://github.com/uber-go/fx) - A dependency injection based application framework
 - [Google Wire](https://blog.golang.org/wire) - Compile-time Dependency Injection based on code generation
-- [dargo](https://github.com/jwells131313/dargo) - Dependency Injector for GO inspired by Java [HK2](https://javaee.github.io/hk2/)
+- [jwells131313/dargo](https://github.com/jwells131313/dargo) - Dependency Injector for GO inspired by Java [HK2](https://javaee.github.io/hk2/)
+- [sarulabs/di](https://github.com/sarulabs/di) - Dependency injection framework for go programs
                                                    
