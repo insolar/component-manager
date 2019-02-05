@@ -1,5 +1,5 @@
 /*
- *    Copyright 2018 Insolar
+ *    Copyright 2019 Insolar Technologies
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -32,7 +32,6 @@ func BenchmarkManager_Inject(b *testing.B) {
 	c9 := &Component1{}
 	c10 := &Component3{}
 
-
 	for i := 0; i < b.N; i++ {
 		cm := Manager{}
 		cm.Inject(c1, c2, c3, c4, c5, c6, c7, c8, c9, c10)
@@ -44,7 +43,6 @@ func BenchmarkManager_Inject2(b *testing.B) {
 	c1 := &Component1{}
 	c2 := &Component2{}
 
-
 	for i := 0; i < b.N; i++ {
 		cm := Manager{}
 		cm.Inject(c1, c2)
@@ -55,7 +53,6 @@ func BenchmarkManager_DirectInject(b *testing.B) {
 	c1 := &Component1{}
 	c2 := &Component2{}
 
-
 	for i := 0; i < b.N; i++ {
 		cm := Manager{}
 		cm.Register(c1, c2)
@@ -63,4 +60,3 @@ func BenchmarkManager_DirectInject(b *testing.B) {
 		c2.Interface1 = c1
 	}
 }
-
