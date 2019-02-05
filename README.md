@@ -1,4 +1,6 @@
 [![Build Status](https://travis-ci.org/insolar/component-manager.svg?branch=master)](https://travis-ci.org/insolar/component-manager)
+[![Go Report Card](https://goreportcard.com/badge/github.com/insolar/component-manager)](https://goreportcard.com/report/github.com/insolar/component-manager)
+[![GoDoc](https://godoc.org/github.com/insolar/component-manager?status.svg)](https://godoc.org/github.com/insolar/component-manager)
 [![codecov](https://codecov.io/gh/insolar/component-manager/branch/master/graph/badge.svg)](https://codecov.io/gh/insolar/component-manager)
 
 # Component Manager
