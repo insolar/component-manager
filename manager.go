@@ -27,8 +27,13 @@ import (
 
 // Manager provide methods to manage components lifecycle
 type Manager struct {
+	parent     *Manager
 	components []interface{}
-	providers  []interface{}
+}
+
+// NewManager creates new component manager
+func NewManager(parent *Manager) *Manager {
+	return &Manager{parent: parent}
 }
 
 // Register components in Manager and inject required dependencies.
@@ -44,17 +49,16 @@ func (m *Manager) Inject(components ...interface{}) {
 	m.Register(components...)
 
 	for _, componentMeta := range m.components {
-		if componentMeta == nil {
-			panic("component is nil")
-		}
-
 		component := reflect.ValueOf(componentMeta).Elem()
 		componentType := component.Type()
 		log.Debugf("ComponentManager: Inject component: %s", componentType.String())
 
 		for i := 0; i < componentType.NumField(); i++ {
 			fieldMeta := componentType.Field(i)
-			if _, ok := fieldMeta.Tag.Lookup("inject"); ok && component.Field(i).IsNil() {
+			if value, ok := fieldMeta.Tag.Lookup("inject"); ok && component.Field(i).IsNil() {
+				if value == "subcomponent" && m.parent == nil {
+					continue
+				}
 				log.Debugf("ComponentManager: Component %s need inject: %s", componentType.String(), fieldMeta.Name)
 				m.mustInject(component, fieldMeta)
 			}
@@ -63,21 +67,13 @@ func (m *Manager) Inject(components ...interface{}) {
 }
 
 func (m *Manager) mustInject(component reflect.Value, fieldMeta reflect.StructField) {
-
-	for _, componentMeta := range append(m.components, m.providers) {
-		componentType := reflect.ValueOf(componentMeta).Type()
-
-		if componentType.Implements(fieldMeta.Type) {
-			field := component.FieldByName(fieldMeta.Name)
-			field.Set(reflect.ValueOf(componentMeta))
-
-			log.Debugf(
-				"ComponentManager: Inject interface %s with %s: ",
-				field.Type().String(),
-				componentType.String(),
-			)
-			return
-		}
+	found := false
+	if m.parent != nil {
+		found = injectDependency(component, fieldMeta, m.parent.components)
+	}
+	found = found || injectDependency(component, fieldMeta, m.components)
+	if found {
+		return
 	}
 
 	panic(fmt.Sprintf(
@@ -88,9 +84,44 @@ func (m *Manager) mustInject(component reflect.Value, fieldMeta reflect.StructFi
 	))
 }
 
+func injectDependency(component reflect.Value, dependencyMeta reflect.StructField, components []interface{}) (injectFound bool) {
+	for _, componentMeta := range components {
+		componentType := reflect.ValueOf(componentMeta).Type()
+
+		if componentType.Implements(dependencyMeta.Type) {
+			field := component.FieldByName(dependencyMeta.Name)
+			field.Set(reflect.ValueOf(componentMeta))
+
+			log.Debugf(
+				"ComponentManager: Inject interface %s with %s: ",
+				field.Type().String(),
+				componentType.String(),
+			)
+			return true
+		}
+	}
+	return false
+}
+
+func (m *Manager) isManaged(component interface{}) bool {
+	// TODO: refactor this behavior
+	if m.parent == nil {
+		return true
+	}
+	for _, c := range m.parent.components {
+		if c == component {
+			return false
+		}
+	}
+	return true
+}
+
 // Start invokes Start method of all components which implements Starter interface
 func (m *Manager) Start(ctx context.Context) error {
 	for _, c := range m.components {
+		if !m.isManaged(c) {
+			continue
+		}
 		name := reflect.TypeOf(c).Elem().String()
 		if s, ok := c.(Starter); ok {
 			log.Debugln("ComponentManager: Start component: ", name)
@@ -98,6 +129,7 @@ func (m *Manager) Start(ctx context.Context) error {
 			if err != nil {
 				return errors.Wrap(err, "Failed to start components.")
 			}
+			log.Debugf("ComponentManager: Component %s started ", name)
 		} else {
 			log.Debugf("ComponentManager: Component %s has no Start method", name)
 		}
@@ -108,6 +140,9 @@ func (m *Manager) Start(ctx context.Context) error {
 // Init invokes Init method of all components which implements Initer interface
 func (m *Manager) Init(ctx context.Context) error {
 	for _, c := range m.components {
+		if !m.isManaged(c) {
+			continue
+		}
 		name := reflect.TypeOf(c).Elem().String()
 		s, ok := c.(Initer)
 		if !ok {
@@ -127,6 +162,9 @@ func (m *Manager) Init(ctx context.Context) error {
 func (m *Manager) Stop(ctx context.Context) error {
 
 	for i := len(m.components) - 1; i >= 0; i-- {
+		if !m.isManaged(m.components[i]) {
+			continue
+		}
 		name := reflect.TypeOf(m.components[i]).Elem().String()
 		if s, ok := m.components[i].(Stopper); ok {
 			log.Debugln("ComponentManager: Stop component: ", name)
