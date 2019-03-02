@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/insolar/component-manager.svg?branch=master)](https://travis-ci.org/insolar/component-manager)
+[![GolangCI](https://golangci.com/badges/github.com/insolar/component-manager.svg)](https://golangci.com/r/github.com/insolar/component-manager/)
 [![Go Report Card](https://goreportcard.com/badge/github.com/insolar/component-manager)](https://goreportcard.com/report/github.com/insolar/component-manager)
 [![GoDoc](https://godoc.org/github.com/insolar/component-manager?status.svg)](https://godoc.org/github.com/insolar/component-manager)
 [![codecov](https://codecov.io/gh/insolar/component-manager/branch/master/graph/badge.svg)](https://codecov.io/gh/insolar/component-manager)
@@ -32,7 +33,7 @@ For monolith component based architecture.
 
 - [facebookgo/inject](https://github.com/facebookgo/inject) - reflect based dependency injector
 - [Uber FX](https://github.com/uber-go/fx) - A dependency injection based application framework
-- [Google Wire](https://blog.golang.org/wire) - Compile-time Dependency Injection based on code generation
+- [Google Wire](https://github.com/google/wire) - Compile-time Dependency Injection based on code generation
 - [jwells131313/dargo](https://github.com/jwells131313/dargo) - Dependency Injector for GO inspired by Java [HK2](https://javaee.github.io/hk2/)
 - [sarulabs/di](https://github.com/sarulabs/di) - Dependency injection framework for go programs
                                                    
