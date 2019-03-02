@@ -196,3 +196,8 @@ func (m *Manager) Stop(ctx context.Context) error {
 	}
 	return nil
 }
+
+// SetLogger sets custom logger
+func (m *Manager) SetLogger(logger Logger) {
+	m.logger = logger
+}
