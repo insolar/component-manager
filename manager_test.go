@@ -22,7 +22,6 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-
 	"github.com/stretchr/testify/require"
 )
 
@@ -86,7 +85,7 @@ func TestComponentManager_Inject(t *testing.T) {
 
 	component1 := &Component1{}
 	component2 := &Component2{}
-	cm := Manager{}
+	cm := NewManager(nil)
 	cm.Inject(component1, component2)
 
 	ctx := context.Background()

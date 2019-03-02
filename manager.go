@@ -19,21 +19,37 @@ package component
 import (
 	"context"
 	"fmt"
+	"log"
 	"reflect"
 
 	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
 )
+
+type Logger interface {
+	Debug(v ...interface{})
+	Debugf(format string, v ...interface{})
+}
+
+type logger struct{}
+
+func (l *logger) Debug(v ...interface{}) {
+	log.Println(v...)
+}
+
+func (l *logger) Debugf(format string, v ...interface{}) {
+	log.Printf(format, v...)
+}
 
 // Manager provide methods to manage components lifecycle
 type Manager struct {
 	parent     *Manager
 	components []interface{}
+	logger Logger
 }
 
 // NewManager creates new component manager
 func NewManager(parent *Manager) *Manager {
-	return &Manager{parent: parent}
+	return &Manager{parent: parent, logger: &logger{}}
 }
 
 // Register components in Manager and inject required dependencies.
@@ -51,7 +67,7 @@ func (m *Manager) Inject(components ...interface{}) {
 	for _, componentMeta := range m.components {
 		component := reflect.ValueOf(componentMeta).Elem()
 		componentType := component.Type()
-		log.Debugf("ComponentManager: Inject component: %s", componentType.String())
+		m.logger.Debugf("ComponentManager: Inject component: %s", componentType.String())
 
 		for i := 0; i < componentType.NumField(); i++ {
 			fieldMeta := componentType.Field(i)
@@ -59,7 +75,7 @@ func (m *Manager) Inject(components ...interface{}) {
 				if value == "subcomponent" && m.parent == nil {
 					continue
 				}
-				log.Debugf("ComponentManager: Component %s need inject: %s", componentType.String(), fieldMeta.Name)
+				m.logger.Debugf("ComponentManager: Component %s need inject: %s", componentType.String(), fieldMeta.Name)
 				m.mustInject(component, fieldMeta)
 			}
 		}
@@ -69,9 +85,9 @@ func (m *Manager) Inject(components ...interface{}) {
 func (m *Manager) mustInject(component reflect.Value, fieldMeta reflect.StructField) {
 	found := false
 	if m.parent != nil {
-		found = injectDependency(component, fieldMeta, m.parent.components)
+		found = m.injectDependency(component, fieldMeta, m.parent.components)
 	}
-	found = found || injectDependency(component, fieldMeta, m.components)
+	found = found || m.injectDependency(component, fieldMeta, m.components)
 	if found {
 		return
 	}
@@ -84,7 +100,7 @@ func (m *Manager) mustInject(component reflect.Value, fieldMeta reflect.StructFi
 	))
 }
 
-func injectDependency(component reflect.Value, dependencyMeta reflect.StructField, components []interface{}) (injectFound bool) {
+func (m *Manager) injectDependency(component reflect.Value, dependencyMeta reflect.StructField, components []interface{}) (injectFound bool) {
 	for _, componentMeta := range components {
 		componentType := reflect.ValueOf(componentMeta).Type()
 
@@ -92,7 +108,7 @@ func injectDependency(component reflect.Value, dependencyMeta reflect.StructFiel
 			field := component.FieldByName(dependencyMeta.Name)
 			field.Set(reflect.ValueOf(componentMeta))
 
-			log.Debugf(
+			m.logger.Debugf(
 				"ComponentManager: Inject interface %s with %s: ",
 				field.Type().String(),
 				componentType.String(),
@@ -124,14 +140,14 @@ func (m *Manager) Start(ctx context.Context) error {
 		}
 		name := reflect.TypeOf(c).Elem().String()
 		if s, ok := c.(Starter); ok {
-			log.Debugln("ComponentManager: Start component: ", name)
+			m.logger.Debug("ComponentManager: Start component: ", name)
 			err := s.Start(ctx)
 			if err != nil {
 				return errors.Wrap(err, "Failed to start components.")
 			}
-			log.Debugf("ComponentManager: Component %s started ", name)
+			m.logger.Debugf("ComponentManager: Component %s started ", name)
 		} else {
-			log.Debugf("ComponentManager: Component %s has no Start method", name)
+			m.logger.Debugf("ComponentManager: Component %s has no Start method", name)
 		}
 	}
 	return nil
@@ -146,10 +162,10 @@ func (m *Manager) Init(ctx context.Context) error {
 		name := reflect.TypeOf(c).Elem().String()
 		s, ok := c.(Initer)
 		if !ok {
-			log.Debugf("ComponentManager: Component %s has no Init method", name)
+			m.logger.Debugf("ComponentManager: Component %s has no Init method", name)
 			continue
 		}
-		log.Debugln("ComponentManager: Init component: ", name)
+		m.logger.Debug("ComponentManager: Init component: ", name)
 		err := s.Init(ctx)
 		if err != nil {
 			return errors.Wrap(err, "Failed to init components.")
@@ -167,14 +183,14 @@ func (m *Manager) Stop(ctx context.Context) error {
 		}
 		name := reflect.TypeOf(m.components[i]).Elem().String()
 		if s, ok := m.components[i].(Stopper); ok {
-			log.Debugln("ComponentManager: Stop component: ", name)
+			m.logger.Debug("ComponentManager: Stop component: ", name)
 
 			err := s.Stop(ctx)
 			if err != nil {
 				return errors.Wrap(err, "Failed to stop components.")
 			}
 		} else {
-			log.Debugf("ComponentManager: Component %s has no Stop method", name)
+			m.logger.Debugf("ComponentManager: Component %s has no Stop method", name)
 		}
 	}
 	return nil
