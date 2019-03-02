@@ -45,7 +45,7 @@ func (l *logger) Debugf(format string, v ...interface{}) {
 type Manager struct {
 	parent     *Manager
 	components []interface{}
-	logger Logger
+	logger     Logger
 }
 
 // NewManager creates new component manager
