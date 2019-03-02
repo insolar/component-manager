@@ -48,7 +48,7 @@ func (s *SubComponent1) Start(ctx context.Context) error {
 	return nil
 }
 
-func (cm *SubComponent1) Method3() {
+func (s *SubComponent1) Method3() {
 	fmt.Println("SubComponent1.Method3 called")
 }
 
@@ -65,11 +65,11 @@ func (s *SubComponent2) Start(ctx context.Context) error {
 	return nil
 }
 
-func (cm *SubComponent2) Stop(ctx context.Context) error {
+func (s *SubComponent2) Stop(ctx context.Context) error {
 	return nil
 }
 
-func (cm *SubComponent2) Method4() {
+func (s *SubComponent2) Method4() {
 	fmt.Println("SubComponent2.Method4 called")
 }
 

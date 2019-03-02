@@ -25,6 +25,7 @@ import (
 	"github.com/pkg/errors"
 )
 
+// Logger interface provides methods for debug logging
 type Logger interface {
 	Debug(v ...interface{})
 	Debugf(format string, v ...interface{})
