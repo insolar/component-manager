@@ -6,7 +6,7 @@
 
 # Component Manager
 
-For monolith component based architecture.
+This package provides dependency injection and lifecycle management for component based monolith architecture.
 
 ### Features 
 
@@ -21,9 +21,9 @@ For monolith component based architecture.
 
 ### Component lifecycle:
 
-- new(just created) 
-- link(inject dependency before start)
-- init
+- new(instance created, first initialization) 
+- inject(required dependency injected)
+- init(second initialization)
 - start(component can call their dependency interfaces, run goroutines)
 - prepare stop(optional)
 - stop (gracefully stop goroutines, close descriptors)
