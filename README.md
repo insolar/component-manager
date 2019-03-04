@@ -8,6 +8,8 @@
 
 This package provides dependency injection and lifecycle management for component based monolith architecture.
 
+See [Demo application](https://github.com/AndreyBronin/golang-di-sandbox)
+
 ### Features 
 
 - two step initialization
