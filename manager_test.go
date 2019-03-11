@@ -73,6 +73,10 @@ func (cm *Component2) Start(ctx context.Context) error {
 	return nil
 }
 
+func (cm *Component2) GracefulStop(ctx context.Context) error {
+	return nil
+}
+
 func (cm *Component2) Stop(ctx context.Context) error {
 	return nil
 }
@@ -92,5 +96,6 @@ func TestComponentManager_Inject(t *testing.T) {
 	require.NoError(t, cm.Init(ctx))
 	assert.Equal(t, "init done", component2.field2)
 	require.NoError(t, cm.Start(ctx))
+	require.NoError(t, cm.GracefulStop(ctx))
 	require.NoError(t, cm.Stop(ctx))
 }
