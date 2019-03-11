@@ -4,8 +4,6 @@ Component Manager provides dependency injection and lifecycle management for com
 
 See [Demo application](https://github.com/AndreyBronin/golang-di-sandbox)
 
-A Component is a struct which can have dependencies and/or can implement lifecycle interfaces.
-
 [![Build Status](https://travis-ci.org/insolar/component-manager.svg?branch=master)](https://travis-ci.org/insolar/component-manager)
 [![GolangCI](https://golangci.com/badges/github.com/insolar/component-manager.svg)](https://golangci.com/r/github.com/insolar/component-manager/)
 [![Go Report Card](https://goreportcard.com/badge/github.com/insolar/component-manager)](https://goreportcard.com/report/github.com/insolar/component-manager)
@@ -25,13 +23,22 @@ A Component is a struct which can have dependencies and/or can implement lifecyc
 
 ## Contetns
 - [Basic usage](#basic-usage)
-	* [Object definition](#object-definition)
+    * [Installing](#installing)
+	* [Component definition](#component-definition)
 	* [Component lifecycle](#component-lifecycle)
 
 
-# Basic usage
+## Basic usage
 
-## Object definition
+## Installing
+To start using Component Manager, install Go 1.9 or above and run `go get`:
+
+```sh
+$ go get github.com/insolar/component-manager
+```
+
+
+## Component definition
 
 A Component is a struct which can have dependencies and/or can implement lifecycle interfaces.
 
