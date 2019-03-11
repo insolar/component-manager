@@ -31,14 +31,24 @@ type Logger interface {
 	Debugf(format string, v ...interface{})
 }
 
-type logger struct{}
+// DefaultLogger logs to std out
+type DefaultLogger struct{}
 
-func (l *logger) Debug(v ...interface{}) {
+func (l *DefaultLogger) Debug(v ...interface{}) {
 	log.Println(v...)
 }
 
-func (l *logger) Debugf(format string, v ...interface{}) {
+func (l *DefaultLogger) Debugf(format string, v ...interface{}) {
 	log.Printf(format, v...)
+}
+
+// NoLogger skips log messages
+type NoLogger struct{}
+
+func (l *NoLogger) Debug(v ...interface{}) {
+}
+
+func (l *NoLogger) Debugf(format string, v ...interface{}) {
 }
 
 // Manager provide methods to manage components lifecycle
@@ -48,9 +58,9 @@ type Manager struct {
 	logger     Logger
 }
 
-// NewManager creates new component manager
+// NewManager creates new component manager with default logger
 func NewManager(parent *Manager) *Manager {
-	return &Manager{parent: parent, logger: &logger{}}
+	return &Manager{parent: parent, logger: &DefaultLogger{}}
 }
 
 // Register components in Manager and inject required dependencies.
@@ -218,7 +228,7 @@ func (m *Manager) Stop(ctx context.Context) error {
 	return nil
 }
 
-// SetLogger sets custom logger
+// SetLogger sets custom DefaultLogger
 func (m *Manager) SetLogger(logger Logger) {
 	m.logger = logger
 }
