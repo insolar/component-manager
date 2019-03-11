@@ -1,17 +1,19 @@
+# Overview 
+
+Component Manager provides dependency injection and lifecycle management for component-based monolith architecture apps.
+
+See [Demo application](https://github.com/AndreyBronin/golang-di-sandbox)
+
+A Component is a struct which can have dependencies and/or can implement lifecycle interfaces.
+
 [![Build Status](https://travis-ci.org/insolar/component-manager.svg?branch=master)](https://travis-ci.org/insolar/component-manager)
 [![GolangCI](https://golangci.com/badges/github.com/insolar/component-manager.svg)](https://golangci.com/r/github.com/insolar/component-manager/)
 [![Go Report Card](https://goreportcard.com/badge/github.com/insolar/component-manager)](https://goreportcard.com/report/github.com/insolar/component-manager)
 [![GoDoc](https://godoc.org/github.com/insolar/component-manager?status.svg)](https://godoc.org/github.com/insolar/component-manager)
 [![codecov](https://codecov.io/gh/insolar/component-manager/branch/master/graph/badge.svg)](https://codecov.io/gh/insolar/component-manager)
 
-# Component Manager
-
-This package provides dependency injection and lifecycle management for component based monolith architecture.
-
-See [Demo application](https://github.com/AndreyBronin/golang-di-sandbox)
 
 ### Features 
-
 - two step initialization
 - reflect based dependency injection for interfaces
 - resolving circular dependency 
@@ -21,7 +23,39 @@ See [Demo application](https://github.com/AndreyBronin/golang-di-sandbox)
 - subcomponents support
 - reduce boilerplate code
 
-### Component lifecycle:
+## Contetns
+- [Basic usage](#basic-usage)
+	* [Object definition](#object-definition)
+	* [Component lifecycle](#component-lifecycle)
+
+
+# Basic usage
+
+## Object definition
+
+A Component is a struct which can have dependencies and/or can implement lifecycle interfaces.
+
+Dependencies defined as fields in the struct and must be an interface type.
+have to be exportable because reflect can set only exportable struct fields.
+Also Dependencies must have tag `inject:""`.
+
+```go
+type Supermarket struct {
+	Warehouse core.Warehouse `inject:""`
+}
+```
+
+```go
+	cm := component.NewManager(nil)
+	cm.Register(producer.NewFarm(), producer.NewDoorFactory())
+	cm.Register(&supermarket.Supermarket{}, &warehouse.Warehouse{})
+	cm.Register(NewCustomer("Bob"), NewCustomer("Alice"))
+	cm.Inject()
+```
+
+## Component lifecycle
+
+Usually components lives from app process executes till process finished. 
 
 - new(instance created, first initialization) 
 - inject(required dependency injected)
@@ -30,8 +64,36 @@ See [Demo application](https://github.com/AndreyBronin/golang-di-sandbox)
 - prepare stop(optional)
 - stop (gracefully stop goroutines, close descriptors)
 
+### Component constructor
 
-### Similar projects
+Constructor with config as param.
+
+### Init and start
+When should use Init and when Start?
+What does it means.
+
+### Stop and gracefully stop
+
+tbd
+
+## intefaces 
+
+```go
+type Initer interface {
+	Init(ctx context.Context) error
+}
+
+type Starter interface {
+	Start(ctx context.Context) error
+}
+
+type Stopper interface {
+	Stop(ctx context.Context) error
+}
+```
+
+
+## Similar projects
 
 - [facebookgo/inject](https://github.com/facebookgo/inject) - reflect based dependency injector
 - [Uber FX](https://github.com/uber-go/fx) - A dependency injection based application framework
