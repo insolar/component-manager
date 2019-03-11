@@ -40,6 +40,7 @@ type Component1 struct {
 	started    bool
 }
 
+
 func (cm *Component1) Start(ctx context.Context) error {
 	cm.Method1()
 	cm.Interface2.Method2()

@@ -21,14 +21,18 @@ See [Demo application](https://github.com/AndreyBronin/golang-di-sandbox)
 - subcomponents support
 - reduce boilerplate code
 
-## Contetns
+## Table of Contents
+- [Overview](#overview)
 - [Basic usage](#basic-usage)
     * [Installing](#installing)
 	* [Component definition](#component-definition)
+	* [Dependency injection](#dependency-injection)
 	* [Component lifecycle](#component-lifecycle)
+	* [Subcomponents](#subcomponents)
+	* [Similar projects](#similar-projects)
 
 
-## Basic usage
+# Basic usage
 
 ## Installing
 To start using Component Manager, install Go 1.9 or above and run `go get`:
@@ -36,7 +40,6 @@ To start using Component Manager, install Go 1.9 or above and run `go get`:
 ```sh
 $ go get github.com/insolar/component-manager
 ```
-
 
 ## Component definition
 
@@ -46,11 +49,25 @@ Dependencies defined as fields in the struct and must be an interface type.
 have to be exportable because reflect can set only exportable struct fields.
 Also Dependencies must have tag `inject:""`.
 
+Constructor with config as param.
+
 ```go
+type Seller interface {
+	Sell(goods string, price uint) error
+}
+
 type Supermarket struct {
-	Warehouse core.Warehouse `inject:""`
+	Buyer core.Buyer `inject:""`
+}
+
+func NewSupermarket(config Configuration) *Supermarket {
+	panic("implement me")
 }
 ```
+
+## Dependency injection
+
+components.uml
 
 ```go
 	cm := component.NewManager(nil)
@@ -62,6 +79,8 @@ type Supermarket struct {
 
 ## Component lifecycle
 
+lifecycle.uml
+
 Usually components lives from app process executes till process finished. 
 
 - new(instance created, first initialization) 
@@ -70,20 +89,6 @@ Usually components lives from app process executes till process finished.
 - start(component can call their dependency interfaces, run goroutines)
 - prepare stop(optional)
 - stop (gracefully stop goroutines, close descriptors)
-
-### Component constructor
-
-Constructor with config as param.
-
-### Init and start
-When should use Init and when Start?
-What does it means.
-
-### Stop and gracefully stop
-
-tbd
-
-## intefaces 
 
 ```go
 type Initer interface {
@@ -94,11 +99,26 @@ type Starter interface {
 	Start(ctx context.Context) error
 }
 
+type GracefulStopper interface {
+	GracefulStop(ctx context.Context) error
+}
+
 type Stopper interface {
 	Stop(ctx context.Context) error
 }
 ```
 
+### Init and start
+When should use Init and when Start?
+What does it means.
+
+### Stop and gracefully stop
+
+tbd
+
+## Subcomponents
+
+tbd
 
 ## Similar projects
 

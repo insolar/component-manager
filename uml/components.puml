@@ -1,0 +1,8 @@
+@startuml
+folder App {
+Seller - [Supermarket]
+[Customer] - buyer
+
+Customer-->Seller
+}
+@enduml
