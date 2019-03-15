@@ -47,12 +47,10 @@ have to be exportable because reflect can set only exportable struct fields.
 Also Dependencies must have tag `inject:""`.
 
 ```go
-type Supermarket struct {
-	Warehouse core.Warehouse `inject:""`
-}
-```
+    type Supermarket struct {
+        Warehouse core.Warehouse `inject:""`
+    }
 
-```go
 	cm := component.NewManager(nil)
 	cm.Register(producer.NewFarm(), producer.NewDoorFactory())
 	cm.Register(&supermarket.Supermarket{}, &warehouse.Warehouse{})
