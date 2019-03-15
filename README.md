@@ -94,6 +94,10 @@ type Starter interface {
 	Start(ctx context.Context) error
 }
 
+type GracefulStopper interface {
+	GracefulStop(ctx context.Context) error
+}
+
 type Stopper interface {
 	Stop(ctx context.Context) error
 }
