@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"log"
 	"reflect"
+	"sync"
 
 	"github.com/pkg/errors"
 )
@@ -56,6 +57,8 @@ type Manager struct {
 	parent     *Manager
 	components []interface{}
 	logger     Logger
+	startStopLock sync.Mutex
+	started       bool
 }
 
 // NewManager creates new component manager with default logger
@@ -78,7 +81,6 @@ func (m *Manager) Inject(components ...interface{}) {
 	for _, componentMeta := range m.components {
 		component := reflect.ValueOf(componentMeta).Elem()
 		componentType := component.Type()
-		m.logger.Debugf("ComponentManager: Inject component: %s", componentType.String())
 
 		for i := 0; i < componentType.NumField(); i++ {
 			fieldMeta := componentType.Field(i)
@@ -86,7 +88,6 @@ func (m *Manager) Inject(components ...interface{}) {
 				if value == "subcomponent" && m.parent == nil {
 					continue
 				}
-				m.logger.Debugf("ComponentManager: Component %s need inject: %s", componentType.String(), fieldMeta.Name)
 				m.mustInject(component, fieldMeta)
 			}
 		}
@@ -119,11 +120,6 @@ func (m *Manager) injectDependency(component reflect.Value, dependencyMeta refle
 			field := component.FieldByName(dependencyMeta.Name)
 			field.Set(reflect.ValueOf(componentMeta))
 
-			m.logger.Debugf(
-				"ComponentManager: Inject interface %s with %s: ",
-				field.Type().String(),
-				componentType.String(),
-			)
 			return true
 		}
 	}
@@ -145,6 +141,9 @@ func (m *Manager) isManaged(component interface{}) bool {
 
 // Start invokes Start method of all components which implements Starter interface
 func (m *Manager) Start(ctx context.Context) error {
+	m.startStopLock.Lock()
+	defer m.startStopLock.Unlock()
+
 	for _, c := range m.components {
 		if !m.isManaged(c) {
 			continue
@@ -157,10 +156,10 @@ func (m *Manager) Start(ctx context.Context) error {
 				return errors.Wrap(err, "Failed to start components.")
 			}
 			m.logger.Debugf("ComponentManager: Component %s started ", name)
-		} else {
-			m.logger.Debugf("ComponentManager: Component %s has no Start method", name)
 		}
 	}
+
+	m.started = true
 	return nil
 }
 
@@ -173,7 +172,6 @@ func (m *Manager) Init(ctx context.Context) error {
 		name := reflect.TypeOf(c).Elem().String()
 		s, ok := c.(Initer)
 		if !ok {
-			m.logger.Debugf("ComponentManager: Component %s has no Init method", name)
 			continue
 		}
 		m.logger.Debug("ComponentManager: Init component: ", name)
@@ -185,7 +183,7 @@ func (m *Manager) Init(ctx context.Context) error {
 	return nil
 }
 
-// Stop invokes Stop method of all components which implements Starter interface
+// GracefulStop invokes GracefulStop method of all components which implements Starter interface
 func (m *Manager) GracefulStop(ctx context.Context) error {
 	for i := len(m.components) - 1; i >= 0; i-- {
 		if !m.isManaged(m.components[i]) {
@@ -199,8 +197,6 @@ func (m *Manager) GracefulStop(ctx context.Context) error {
 			if err != nil {
 				return errors.Wrap(err, "Failed to gracefully stop components.")
 			}
-		} else {
-			m.logger.Debugf("ComponentManager: Component %s has no GracefulStop method", name)
 		}
 	}
 	return nil
@@ -208,6 +204,13 @@ func (m *Manager) GracefulStop(ctx context.Context) error {
 
 // Stop invokes Stop method of all components which implements Starter interface
 func (m *Manager) Stop(ctx context.Context) error {
+	m.startStopLock.Lock()
+	defer m.startStopLock.Unlock()
+
+	if !m.started {
+		m.logger.Debug("ComponentManager: components are not started. Skip stopping")
+		return nil
+	}
 
 	for i := len(m.components) - 1; i >= 0; i-- {
 		if !m.isManaged(m.components[i]) {
@@ -221,8 +224,6 @@ func (m *Manager) Stop(ctx context.Context) error {
 			if err != nil {
 				return errors.Wrap(err, "Failed to stop components.")
 			}
-		} else {
-			m.logger.Debugf("ComponentManager: Component %s has no Stop method", name)
 		}
 	}
 	return nil

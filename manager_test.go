@@ -21,7 +21,6 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -57,23 +56,9 @@ type Component2 struct {
 	started    bool
 }
 
-type Component3 struct {
-	Interface1 Interface1 `inject:""`
-	Interface2 Interface1 `inject:""`
-}
-
-func (cm *Component2) Init(ctx context.Context) error {
-	cm.field2 = "init done"
-	return nil
-}
-
 func (cm *Component2) Start(ctx context.Context) error {
 	cm.Interface1.Method1()
 	cm.Method2()
-	return nil
-}
-
-func (cm *Component2) GracefulStop(ctx context.Context) error {
 	return nil
 }
 
@@ -86,16 +71,44 @@ func (cm *Component2) Method2() {
 }
 
 func TestComponentManager_Inject(t *testing.T) {
-
-	component1 := &Component1{}
-	component2 := &Component2{}
 	cm := NewManager(nil)
-	cm.Inject(component1, component2)
+	cm.Inject(&Component1{}, &Component2{})
 
-	ctx := context.Background()
-	require.NoError(t, cm.Init(ctx))
-	assert.Equal(t, "init done", component2.field2)
-	require.NoError(t, cm.Start(ctx))
-	require.NoError(t, cm.GracefulStop(ctx))
-	require.NoError(t, cm.Stop(ctx))
+	require.NoError(t, cm.Start(nil))
+	require.NoError(t, cm.Stop(nil))
+}
+
+type Component3 struct {
+	started bool
+	stopped bool
+}
+
+func (c *Component3) Start(ctx context.Context) error {
+	c.started = true
+	return nil
+}
+
+func (c *Component3) Stop(ctx context.Context) error {
+	c.stopped = true
+	return nil
+}
+
+func TestComponentManager_NoCallStopIfNoCallStart(t *testing.T) {
+	c := Component3{}
+	cm := NewManager(nil)
+	cm.Inject(&c)
+	err := cm.Stop(context.Background())
+	require.NoError(t, err)
+	require.False(t, c.stopped)
+	require.False(t, c.started)
+
+	err = cm.Start(context.Background())
+	require.NoError(t, err)
+	require.False(t, c.stopped)
+	require.True(t, c.started)
+
+	err = cm.Stop(context.Background())
+	require.NoError(t, err)
+	require.True(t, c.stopped)
+	require.True(t, c.started)
 }
