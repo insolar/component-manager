@@ -102,6 +102,21 @@ type Stopper interface {
 ```
 
 
+```
+Замечания
+разделить инжекты и жизненный цикл
+инжекст свободными функциями
+
+MustInject() {panic """}
+ForceInject()
+Inject() error
+
+cm.Register().Inject()
+
+DI agnostic LifeCycle!!
+
+```
+
 ## Similar projects
 
 - [facebookgo/inject](https://github.com/facebookgo/inject) - reflect based dependency injector

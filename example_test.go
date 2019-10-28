@@ -40,8 +40,8 @@ func NewCustomer(name string) *Customer {
 }
 
 func Example() {
-	cm := component.NewManager(nil)
+	cm := component.NewManager()
 	cm.Register(&Supermarket{})
 	cm.Register(NewCustomer("Bob"), NewCustomer("Alice"))
-	cm.Inject()
+	component.Inject()
 }

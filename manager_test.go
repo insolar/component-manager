@@ -89,8 +89,10 @@ func TestComponentManager_Inject(t *testing.T) {
 
 	component1 := &Component1{}
 	component2 := &Component2{}
-	cm := NewManager(nil)
-	cm.Inject(component1, component2)
+
+	Inject(component1, component2)
+	cm := NewManager()
+	cm.Register(component1, component2)
 
 	ctx := context.Background()
 	require.NoError(t, cm.Init(ctx))

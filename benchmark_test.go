@@ -33,9 +33,9 @@ func BenchmarkManager_Inject(b *testing.B) {
 	c10 := &Component3{}
 
 	for i := 0; i < b.N; i++ {
-		cm := NewManager(nil)
+		cm := NewManager()
 		cm.SetLogger(&NoLogger{})
-		cm.Inject(c1, c2, c3, c4, c5, c6, c7, c8, c9, c10)
+		Inject(c1, c2, c3, c4, c5, c6, c7, c8, c9, c10)
 	}
 
 }
@@ -45,9 +45,9 @@ func BenchmarkManager_Inject2(b *testing.B) {
 	c2 := &Component2{}
 
 	for i := 0; i < b.N; i++ {
-		cm := NewManager(nil)
+		cm := NewManager()
 		cm.SetLogger(&NoLogger{})
-		cm.Inject(c1, c2)
+		Inject(c1, c2)
 	}
 }
 
@@ -56,7 +56,7 @@ func BenchmarkManager_DirectInject(b *testing.B) {
 	c2 := &Component2{}
 
 	for i := 0; i < b.N; i++ {
-		cm := NewManager(nil)
+		cm := NewManager()
 		cm.SetLogger(&NoLogger{})
 		cm.Register(c1, c2)
 		c1.Interface2 = c2
